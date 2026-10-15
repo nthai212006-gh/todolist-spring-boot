@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Todos</title>
+    <style>
+        body { font-family: Segoe UI, sans-serif; margin: 24px; }
+        .user-bar { background: #f0f4f8; padding: 10px 16px; margin-bottom: 16px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        a, button { margin-right: 8px; }
+    </style>
+</head>
+<body>
+<div class="user-bar">
+    <div>
+        Logged in as: <strong sec:authentication="name">User</strong>
+        (<span sec:authentication="principal.authorities">[ROLE_USER]</span>)
+    </div>
+    <form th:action="@{/logout}" method="post" style="display:inline">
+        <button type="submit">Logout</button>
+    </form>
+</div>
+<h1>Todo list</h1>
+<p><a th:href="@{/todos/new}">New todo</a></p>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th><th>Title</th><th>Due</th><th>Done</th><th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="t : ${todos}">
+        <td th:text="${t.id}">1</td>
+        <td th:text="${t.title}">title</td>
+        <td th:text="${t.dueDate}">2026-01-01</td>
+        <td th:text="${t.completed} ? 'Yes' : 'No'">No</td>
+        <td>
+            <a th:href="@{/todos/{id}/edit(id=${t.id})}">Edit</a>
+            <!-- Delete button is ONLY rendered for users with ADMIN role -->
+            <form sec:authorize="hasRole('ADMIN')"
+                  th:action="@{/todos/{id}/delete(id=${t.id})}"
+                  method="post" style="display:inline">
+                <button type="submit">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
